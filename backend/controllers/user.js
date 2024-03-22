@@ -142,7 +142,7 @@ const updateUser = async (req, res) => {
 
 		user = await user.save();
 
-
+		//	for security
 		user.password = null;
 
 		res.status(200).json(user);
