@@ -1,35 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Box, Container } from "@chakra-ui/react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import Header from "./components/Header";
+import AuthPage from "./pages/AuthPage";
+import { useRecoilValue } from "recoil";
+import userAtom from "./atoms/userAtom";
+import UpdateProfilePage from "./pages/UpdateProfilePage";
+import ChatPage from "./pages/ChatPage";
+import { SettingsPage } from "./pages/SettingsPage";
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	const user = useRecoilValue(userAtom);
+	const { pathname } = useLocation();
+	return (
+		<Box position={"relative"} w='full'>
+			<Container maxW={pathname === "/" ? { base: "620px", md: "900px" } : "620px"}>
+				<Header />
+				<Routes>
+					<Route path='/' element={user ? <ChatPage /> : <Navigate to='/auth' />} />
+					<Route path='/auth' element={!user ? <AuthPage /> : <Navigate to='/' />} />
+					<Route path='/update' element={user ? <UpdateProfilePage /> : <Navigate to='/auth' />} />
+					<Route path='/settings' element={user ? <SettingsPage /> : <Navigate to={"/auth"} />} />
+				</Routes>
+			</Container>
+		</Box>
+	);
 }
 
-export default App
+export default App;
