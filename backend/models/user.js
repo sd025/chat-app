@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
 	{
-		fullName: {
+		name: {
 			type: String,
 			required: true,
 		},
@@ -25,7 +25,14 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			default: "",
 		},
-		// createdAt, updatedAt => Member since <createdAt>
+		bio: {
+			type: String,
+			default: "",
+		},
+		isFrozen: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	{ timestamps: true }
 );

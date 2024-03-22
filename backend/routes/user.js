@@ -1,9 +1,21 @@
 import express from "express";
-import protectRoute from "../middleware/protectRoute.js";
-import { getUsersForSidebar } from "../controllers/user.js";
+import {
+	getUserProfile,
+	loginUser,
+	logoutUser,
+	signupUser,
+	updateUser,
+	freezeAccount,
+} from "../controllers/user.js";
+import protectRoute from "../middlewares/protectRoute.js";
 
 const router = express.Router();
 
-router.get("/", protectRoute, getUsersForSidebar);
+router.get("/profile/:query", getUserProfile);
+router.post("/signup", signupUser);
+router.post("/login", loginUser);
+router.post("/logout", logoutUser);
+router.put("/update/:id", protectRoute, updateUser);
+router.put("/freeze", protectRoute, freezeAccount);
 
 export default router;

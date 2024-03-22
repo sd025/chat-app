@@ -2,21 +2,31 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
 	{
-		senderId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
-			required: true,
+		conversationId: { type: mongoose.Schema.Types.ObjectId, ref: "Conversation" },
+		sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+		text: String,
+		// senderId: {
+		// 	type: mongoose.Schema.Types.ObjectId,
+		// 	ref: "User",
+		// 	required: true,
+		// },
+		// receiverId: {
+		// 	type: mongoose.Schema.Types.ObjectId,
+		// 	ref: "User",
+		// 	required: true,
+		// },
+		// message: {
+		// 	type: String,
+		// 	required: true,
+		// },
+		seen: {
+			type: Boolean,
+			default: false,
 		},
-		receiverId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
-			required: true,
-		},
-		message: {
+		img: {
 			type: String,
-			required: true,
+			default: "",
 		},
-		// createdAt, updatedAt
 	},
 	{ timestamps: true }
 );

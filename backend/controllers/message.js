@@ -1,69 +1,102 @@
 import Conversation from "../models/conversation.js";
 import Message from "../models/message.js";
-import { getReceiverSocketId, io } from "../socket/socket.js";
+import { getRecipientSocketId, io } from "../socket/socket.js";
+import { v2 as cloudinary } from "cloudinary";
 
-export const sendMessage = async (req, res) => {
+async function sendMessage(req, res) {
 	try {
-		const { message } = req.body;
-		const { id: receiverId } = req.params;
+		const { recipientId, message } = req.body;
+		let { img } = req.body;
 		const senderId = req.user._id;
 
 		let conversation = await Conversation.findOne({
-			participants: { $all: [senderId, receiverId] },
+			participants: { $all: [senderId, recipientId] },
 		});
 
 		if (!conversation) {
-			conversation = await Conversation.create({
-				participants: [senderId, receiverId],
+			conversation = new Conversation({
+				participants: [senderId, recipientId],
+				lastMessage: {
+					text: message,
+					sender: senderId,
+				},
 			});
+			await conversation.save();
+		}
+
+		if (img) {
+			const uploadedResponse = await cloudinary.uploader.upload(img);
+			img = uploadedResponse.secure_url;
 		}
 
 		const newMessage = new Message({
-			senderId,
-			receiverId,
-			message,
+			conversationId: conversation._id,
+			sender: senderId,
+			text: message,
+			img: img || "",
 		});
 
-		if (newMessage) {
-			conversation.messages.push(newMessage._id);
-		}
+		await Promise.all([
+			newMessage.save(),
+			conversation.updateOne({
+				lastMessage: {
+					text: message,
+					sender: senderId,
+				},
+			}),
+		]);
 
-		// await conversation.save();
-		// await newMessage.save();
-
-		// this will run in parallel
-		await Promise.all([conversation.save(), newMessage.save()]);
-
-		// SOCKET IO FUNCTIONALITY WILL GO HERE
-		const receiverSocketId = getReceiverSocketId(receiverId);
-		if (receiverSocketId) {
-			// io.to(<socket_id>).emit() used to send events to specific client
-			io.to(receiverSocketId).emit("newMessage", newMessage);
+		const recipientSocketId = getRecipientSocketId(recipientId);
+		if (recipientSocketId) {
+			io.to(recipientSocketId).emit("newMessage", newMessage);
 		}
 
 		res.status(201).json(newMessage);
 	} catch (error) {
-		console.log("Error in sendMessage controller: ", error.message);
-		res.status(500).json({ error: "Internal server error" });
+		res.status(500).json({ error: error.message });
 	}
-};
+}
 
-export const getMessages = async (req, res) => {
+async function getMessages(req, res) {
+	const { otherUserId } = req.params;
+	const userId = req.user._id;
 	try {
-		const { id: userToChatId } = req.params;
-		const senderId = req.user._id;
-
 		const conversation = await Conversation.findOne({
-			participants: { $all: [senderId, userToChatId] },
-		}).populate("messages"); // NOT REFERENCE BUT ACTUAL MESSAGES
+			participants: { $all: [userId, otherUserId] },
+		});
 
-		if (!conversation) return res.status(200).json([]);
+		if (!conversation) {
+			return res.status(404).json({ error: "Conversation not found" });
+		}
 
-		const messages = conversation.messages;
+		const messages = await Message.find({
+			conversationId: conversation._id,
+		}).sort({ createdAt: 1 });
 
 		res.status(200).json(messages);
 	} catch (error) {
-		console.log("Error in getMessages controller: ", error.message);
-		res.status(500).json({ error: "Internal server error" });
+		res.status(500).json({ error: error.message });
 	}
-};
+}
+
+async function getConversations(req, res) {
+	const userId = req.user._id;
+	try {
+		const conversations = await Conversation.find({ participants: userId }).populate({
+			path: "participants",
+			select: "username profilePic",
+		});
+
+		// remove the current user from the participants array
+		conversations.forEach((conversation) => {
+			conversation.participants = conversation.participants.filter(
+				(participant) => participant._id.toString() !== userId.toString()
+			);
+		});
+		res.status(200).json(conversations);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+}
+
+export { sendMessage, getMessages, getConversations };
