@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
+const userSchema = mongoose.Schema(
 	{
 		name: {
 			type: String,
@@ -11,14 +11,27 @@ const userSchema = new mongoose.Schema(
 			required: true,
 			unique: true,
 		},
-		password: {
+		email: {
 			type: String,
 			required: true,
-			minlength: 6,
+			unique: true,
+		},
+		password: {
+			type: String,
+			minLength: 6,
+			required: true,
 		},
 		profilePic: {
 			type: String,
 			default: "",
+		},
+		followers: {
+			type: [String],
+			default: [],
+		},
+		following: {
+			type: [String],
+			default: [],
 		},
 		bio: {
 			type: String,
@@ -29,7 +42,9 @@ const userSchema = new mongoose.Schema(
 			default: false,
 		},
 	},
-	{ timestamps: true }
+	{
+		timestamps: true,
+	}
 );
 
 const User = mongoose.model("User", userSchema);
