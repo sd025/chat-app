@@ -39,6 +39,7 @@ function HomePage() {
             app
           </Text>
           <Stack
+            pb={10}
             direction={"column"}
             spacing={3}
             align={"center"}
