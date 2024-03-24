@@ -21,13 +21,8 @@ function HomePage() {
 
   return (
     <>
-      <Container maxW={"3xl"}>
-        <Stack
-          as={Box}
-          textAlign={"center"}
-          spacing={{ base: 8, md: 14 }}
-          py={{ base: 20, md: 36 }}
-        >
+      <Container maxW={"3xl"} py={{ base: 15, md: 26 }}>
+        <Stack as={Box} textAlign={"center"} spacing={{ base: 8, md: 14 }}>
           <Heading
             fontWeight={600}
             fontSize={{ base: "2xl", sm: "4xl", md: "6xl" }}
@@ -63,22 +58,6 @@ function HomePage() {
                 Get Started
               </Button>
             </Link>
-
-        <Flex gap="10" alignItems={"flex-start"}>
-          <Box
-            flex={30}
-            display={{
-              md: "block",
-            }}
-          >
-            <SuggestedUsers />
-          </Box>
-        </Flex>
-            <Link to={user ? `/${user.username}` : ""}>
-              <Button variant={"link"} colorScheme={"blue"} size={"sm"}>
-                Learn more
-              </Button>
-            </Link>
             <Box>
               <Icon
                 as={Arrow}
@@ -101,7 +80,23 @@ function HomePage() {
             </Box>
           </Stack>
         </Stack>
-
+        <Stack justify={"center"} alignItems={"center"}>
+          <Flex gap="10" justifySelf={"flex-start"} alignItems={"flex-start"}>
+            <Box
+              flex={30}
+              display={{
+                md: "block",
+              }}
+            >
+              <SuggestedUsers />
+            </Box>
+          </Flex>
+          <Link to={user ? `/${user.username}` : ""}>
+            <Button variant={"link"} colorScheme={"blue"} size={"sm"}>
+              Learn more
+            </Button>
+          </Link>
+        </Stack>
       </Container>
     </>
   );
