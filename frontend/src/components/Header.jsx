@@ -33,16 +33,19 @@ const Header = () => {
         </Link>
       )}
 
-      <Image
-        cursor={"pointer"}
-        alt="logo"
-        w={6}
-        src={colorMode === "dark" ? "/light-logo.svg" : "/dark-logo.svg"}
-        onClick={toggleColorMode}
-      />
-
       {user && (
         <Flex alignItems={"center"} gap={4}>
+          <Image
+            cursor={"pointer"}
+            alt="logo"
+            w={7}
+            src={
+              colorMode === "dark"
+                ? "https://img.icons8.com/?size=160&id=H3yHeysB1dxv&format=png"
+                : "https://img.icons8.com/?size=96&id=JARydttrNTU2&format=png"
+            }
+            onClick={toggleColorMode}
+          />
           <Link as={RouterLink} to={`/${user.username}`}>
             <RxAvatar size={24} />
           </Link>
