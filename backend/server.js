@@ -15,7 +15,7 @@ connectDB();
 // job.start();
 
 const PORT = process.env.PORT || 4000;
-// const __dirname = path.resolve();
+const __dirname = path.resolve();
 
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -32,15 +32,15 @@ app.use(cookieParser());
 app.use("/api/users", userRoutes);
 app.use("/api/messages", messageRoutes);
 
-// http://localhost:5000 => backend,frontend
+http://localhost:5000 => backend,frontend
 
-// if (process.env.NODE_ENV === "production") {
-// 	app.use(express.static(path.join(__dirname, "/frontend/dist")));
+if (process.env.NODE_ENV === "production") {
+	app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-// 	// react app
-// 	app.get("*", (req, res) => {
-// 		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-// 	});
-// }
+	// react app
+	app.get("*", (req, res) => {
+		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+	});
+}
 
 server.listen(PORT, () => console.log(`Server started at http://localhost:${PORT}`));
